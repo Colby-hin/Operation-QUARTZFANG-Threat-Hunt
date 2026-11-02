@@ -1,0 +1,6 @@
+DeviceProcessEvents_CL
+| where Timestamp between (datetime(2026-09-20 07:04:00) .. datetime(2026-09-20 07:07:00))
+| where DeviceName =~ "sc-portal01"
+| where FileName in~ ("cat", "env")
+| project Timestamp, DeviceName, FileName, ProcessCommandLine, ProcessId, InitiatingProcessFileName, InitiatingProcessId, AccountName
+| order by Timestamp asc

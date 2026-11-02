@@ -1,0 +1,8 @@
+DeviceProcessEvents_CL
+| where Timestamp between (datetime(2026-09-18 00:00:00) .. datetime(2026-09-21 06:00:00))
+| where DeviceName == "sc-db01"
+| where FileName == "pg_dump"
+| where (hourofday(Timestamp) == 2 and datetime_part("minute", Timestamp) >= 55)
+    or (hourofday(Timestamp) == 3 and datetime_part("minute", Timestamp) <= 5)
+| distinct Timestamp, AccountName, ProcessCommandLine, InitiatingProcessFileName
+| order by Timestamp asc

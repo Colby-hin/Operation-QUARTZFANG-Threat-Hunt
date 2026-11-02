@@ -1,0 +1,6 @@
+Syslog
+| where TimeGenerated between (datetime(2026-09-20 07:25:00) .. datetime(2026-09-20 07:35:00))
+| where Computer == "sc-db01"
+| where SyslogMessage contains "FATAL" or SyslogMessage contains "connection"
+| project TimeGenerated, ProcessName, SyslogMessage
+| order by TimeGenerated asc

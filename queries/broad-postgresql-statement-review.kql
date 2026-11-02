@@ -1,0 +1,10 @@
+Syslog
+| where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where Computer =~ "sc-db01"
+| where SyslogMessage contains "statement"
+    or SyslogMessage contains "SELECT"
+    or SyslogMessage contains "COPY"
+    or SyslogMessage contains "pg_catalog"
+| extend Phase = iff(TimeGenerated < datetime(2026-09-20 07:05:00), "Before credential theft", "After credential theft")
+| distinct TimeGenerated, Phase, ProcessName, SyslogMessage
+| order by TimeGenerated asc

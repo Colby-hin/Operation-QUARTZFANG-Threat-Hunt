@@ -1,0 +1,7 @@
+ContainerRegistryLog_CL
+| where TimeGenerated between (datetime(2026-09-20 07:30:00) .. datetime(2026-09-20 07:36:00))
+| where Computer =~ "sc-registry01"
+| where SrcIpAddr == "10.5.0.10"
+| project TimeGenerated, Username, Operation, Resource, Repository, HttpStatusCode
+| distinct TimeGenerated, Username, Operation, Resource, Repository, HttpStatusCode
+| order by TimeGenerated asc

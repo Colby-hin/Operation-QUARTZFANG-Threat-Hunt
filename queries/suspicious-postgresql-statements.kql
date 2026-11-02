@@ -1,0 +1,13 @@
+Syslog
+| where TimeGenerated between (datetime(2026-09-20 07:05:00) .. datetime(2026-09-20 07:50:00))
+| where Computer =~ "sc-db01"
+| where ProcessName =~ "postgres"
+| where SyslogMessage startswith "statement: SELECT"
+| where SyslogMessage contains "SELECT *"
+    or SyslogMessage contains "information_schema"
+    or SyslogMessage contains "pg_catalog"
+    or SyslogMessage contains "password_hash"
+    or SyslogMessage contains "email, phone"
+    or SyslogMessage contains "project_name, revision"
+| distinct TimeGenerated, SyslogMessage
+| order by TimeGenerated asc

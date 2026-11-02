@@ -1,0 +1,13 @@
+let processStarts = DeviceProcessEvents_CL
+| where Timestamp between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+| where DeviceName =~ "sc-portal01"
+| project DeviceName, InitiatingProcessId=ProcessId, ParentProcess=InitiatingProcessFileName, ProcessCommandLine
+| distinct DeviceName, InitiatingProcessId, ParentProcess, ProcessCommandLine;
+DeviceNetworkEvents_CL
+| where Timestamp between (datetime(2026-09-20 08:00:00) .. datetime(2026-09-20 08:25:00))
+| where DeviceName =~ "sc-portal01"
+| where RemotePort == 443
+| join kind=leftouter processStarts on DeviceName, InitiatingProcessId
+| summarize Connections=count(), FirstSeen=min(Timestamp), LastSeen=max(Timestamp)
+    by RemoteIP, InitiatingProcessId, InitiatingProcessFileName, ParentProcess, ProcessCommandLine
+| order by FirstSeen asc

@@ -1,0 +1,6 @@
+LLMAgentLogs_CL
+| where TimeGenerated between (datetime(2026-10-24 06:30:00) .. datetime(2026-10-24 07:50:00))
+| where actor == "quartzfang-agent"
+| where isnotempty(user_input)
+| project TimeGenerated, user_input, model_response
+| order by TimeGenerated asc

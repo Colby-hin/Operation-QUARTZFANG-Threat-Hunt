@@ -1,0 +1,41 @@
+union
+(
+    PortalAccessLog_CL
+    | where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+    | where Computer =~ "sc-portal01" and SrcIpAddr == "203.0.113.87"
+    | project EventTime=TimeGenerated, Phase="Portal exploitation", Detail=strcat(HttpMethod, " ", substring(UrlOriginal, 0, 90))
+),
+(
+    DeviceProcessEvents_CL
+    | where Timestamp between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+    | where DeviceName =~ "sc-portal01" and (ProcessId == 4401 or InitiatingProcessId == 4401)
+    | project EventTime=Timestamp, Phase="Malicious process tree", Detail=strcat(FileName, " ", substring(ProcessCommandLine, 0, 90))
+),
+(
+    Syslog
+    | where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+    | where Computer =~ "sc-db01"
+    | where SyslogMessage contains "SELECT *" or SyslogMessage contains "information_schema" or SyslogMessage contains "pg_catalog"
+    | project EventTime=TimeGenerated, Phase="Database enumeration", Detail=SyslogMessage
+),
+(
+    ContainerRegistryLog_CL
+    | where TimeGenerated between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+    | where Computer =~ "sc-registry01" and SrcIpAddr == "10.5.0.10"
+    | project EventTime=TimeGenerated, Phase="Registry pivot", Detail=strcat(Operation, " ", Repository)
+),
+(
+    DeviceNetworkEvents_CL
+    | where Timestamp between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+    | where DeviceName =~ "sc-portal01" and RemoteIP == "198.51.100.210"
+    | project EventTime=Timestamp, Phase="Outbound transfer", Detail=strcat(InitiatingProcessFileName, " to ", RemoteIP, ":", tostring(RemotePort))
+),
+(
+    DeviceEvents_CL
+    | where Timestamp between (datetime(2026-09-20 06:30:00) .. datetime(2026-09-20 08:30:00))
+    | where DeviceName =~ "sc-portal01" and AccountName == "svc_monitor"
+    | project EventTime=Timestamp, Phase="Persistence", Detail=strcat(ActionType, " ", AccountName)
+)
+| distinct EventTime, Phase, Detail
+| order by EventTime asc
+| serialize GapSeconds = datetime_diff("second", EventTime, prev(EventTime))

@@ -1,0 +1,6 @@
+DeviceFileEvents_CL
+| where Timestamp between (datetime(2026-09-20 07:45:00) .. datetime(2026-09-20 08:16:00))
+| where DeviceName =~ "sc-portal01"
+| project Timestamp, ActionType, FolderPath, FileName, InitiatingProcessFileName
+| distinct Timestamp, ActionType, FolderPath, FileName, InitiatingProcessFileName
+| order by Timestamp asc

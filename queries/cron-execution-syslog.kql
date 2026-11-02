@@ -1,0 +1,5 @@
+Syslog
+| where TimeGenerated between (datetime(2026-09-20 06:52:00) .. datetime(2026-09-20 06:55:00))
+| where Computer =~ "sc-portal01"
+| project TimeGenerated, Computer, ProcessName, SyslogMessage
+| order by TimeGenerated asc

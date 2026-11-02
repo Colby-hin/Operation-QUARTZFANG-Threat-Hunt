@@ -1,0 +1,5 @@
+PortalAccessLog_CL
+| where TimeGenerated between (datetime(2026-09-20 06:45:00) .. datetime(2026-09-20 06:55:00))
+| where Computer =~ "sc-portal01"
+| project TimeGenerated, SrcIpAddr, HttpMethod, UrlOriginal, HttpStatusCode, UserAgent
+| order by TimeGenerated asc
